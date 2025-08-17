@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>入力練習3-3</title>
+    </head>
+    <body>
+        <h1>入力データの取り出し練習</h1>
+
+        <p>
+            名前：<input type="text" id ="name" placeholder="名前を入力してください">
+            <button onclick="getName()">名前を取得</button>
+        </p>
+        <p id ="name-result">ここに名前を表示</p>
+        <hr>
+
+        <p>
+            好きな色：
+                <select id="color">
+                    <option value="">色を選択してください</option>
+                    <option value="赤">赤</option>
+                    <option value="青">青</option>
+                    <option value="緑">緑</option>
+                </select>
+                <button onclick="getColor()">色を取得</button>
+        </p>
+        <p id="color-result">ここに色を表示</p>
+        <hr>
+
+        <p>
+            メッセージ：<br>
+            <textarea id="message"></textarea><br>
+            <button onclick="getMessage()">メッセージを取得</button>
+        </p>
+        <p id="message-result">ここにメッセージを表示</p>
+        <hr>
+
+
+
+        <script>
+        function getName(){
+            //「const name = document.getElementById("name").value;」で1行にしても良い
+            const name = document.getElementById("name");
+            const nameInput = name.value;
+
+            document.getElementById("name-result").innerText = `あなたの名前：${nameInput.trim()}`;
+        }
+            
+        function getColor(){
+            //getName関数の1行バージョン
+            const colorInput = document.getElementById("color").value;
+
+            document.getElementById("color-result").innerText = `選んだ色：${colorInput}`;
+        }
+
+        function getMessage(){
+            const messageInput = document.getElementById("message").value;
+
+            document.getElementById("message-result").innerText = `メッセージ：${messageInput}`;
+        }
+        </script>
+
+    </body>
+</html>

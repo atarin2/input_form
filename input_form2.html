@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>記録フォーム</title>
+</head>
+<body>
+    <h1>記録フォーム</h1>
+    
+    <form id="inputForm">
+        <label>日付*：<input type="date" id="date" name="date" required></label>
+        <label>時刻：<input type="time" id="time" name="time"></label>
+        <br>
+
+        <label>カテゴリ*：
+            <select id="category" name="category" required>
+                <option value="">カテゴリを選択してください</option>
+                <option value="提出物">提出物</option>
+                <option value="学習">学習</option>
+                <option value="生活">生活</option>
+                <option value="その他">その他</option>
+            </select>
+        </label>
+        <br>
+
+        <label>内容*：
+            <br>
+            <textarea id="content" name="content" placeholder="内容を入力してください" required></textarea>
+        </label>
+        <br>
+
+        <button type="submit">記録する</button>
+        <hr>
+    </form>
+
+    <h2>記録一覧</h2>
+
+    <div>
+        <strong>カテゴリで絞り込み：</strong>
+        <button onclick="filterCategory('すべて')">すべて</button>
+        <button onclick="filterCategory('提出物')">提出物</button>
+        <button onclick="filterCategory('学習')">学習</button>
+        <button onclick="filterCategory('生活')">生活</button>
+        <button onclick="filterCategory('その他')">その他</button>
+    </div>
+    
+    <p id="recordList">記録がありません</p>
+    <hr>
+
+
+    <!--ここからJavascript-->
+    <script>
+        let records = [];
+
+        document.getElementById("inputForm").addEventListener("submit",function(reloadStop) {
+            reloadStop.preventDefault();
+
+        //FormDataは<form>の入力値を自動で集める・thisはidのinputFormを示す「valueを自動でやってくれている」
+        const formData = new FormData(this);
+
+        //理解しやすいようにリストの名前を日本語表記
+        const record = {
+            id: Date.now(), //データを１つ１つ特定できるよう日時を使ったID作成
+            date: formData.get("date"),
+            time: formData.get("time"),
+            category: formData.get("category"),
+            content: formData.get("content"),
+        };
+
+        //配列にリストの情報を追加
+        records.push(record);
+        //関数outputRecordsよりデータを並び替えて表示する
+        outputRecords();
+        //フォームの入力欄の内容を空にする
+        this.reset();
+        //新しい日付を取得してid="date"部分に入れる
+        document.getElementById("date").valueAsDate = new Date();
+
+        alert("記録しました")
+        
+    });
+
+
+    function outputRecords(){
+        //配列recordsのコピーを作成して日付順に入れ替え
+        const sortedRecords = [...records].sort((a, b) => {
+            const dateTimeA = new Date(a.date + ' ' + (a.time || "00:00"));
+            const dateTimeB = new Date(b.date + ' ' + (b.time || "00:00"));
+            return dateTimeA - dateTimeB;
+        });
+
+        if (records.length === 0){
+            document.getElementById('recordList').innerHTML = `<p>記録がありません</p>`
+            return;
+        }
+
+        //sortedrecordsで入れ替えたものを順番に取り出す
+        let html = '';
+        //recordは単なる引数なので名前は何でもよい
+        sortedRecords.forEach(record =>{
+            html += `
+                <!--records.timeに値があれば値を取り出し、なければ空文字を入れる-->
+                <strong>${record.date}　${record.time ? record.time : ''}</strong><br>
+                カテゴリ：${record.category}<br>
+                内容：${record.content}<br>
+                <button onclick="deleteRecord(${record.id})">削除</button><br>
+                `;
+            });
+
+        //表示したい場所を新しいHTMLに入れ替える
+        document.getElementById("recordList").innerHTML = html;
+    }
+    
+    //受け取ったidを元に削除するものを指定
+    function deleteRecord(id) {
+        if (confirm('この記録を削除しますか？')){
+            //配列内のidを確認して指定したidじゃなければ残る ※record =>の名前は何でもいい
+            records = records.filter(record => record.id !== id);
+            //データ削除後の画面更新
+            outputRecords();
+        }
+
+    }
+
+    function filterCategory(category) {
+        if (category === 'すべて'){
+            outputRecords();
+            return;
+        }
+
+        //a => a.categoryでも動作する　※名前は何でもいい
+        const filterRecord = records.filter(record => record.category === category);
+
+        if (filterRecord.length === 0){
+            document.getElementById('recordList').innerHTML = `<p>「${category}」の記録がありません</p>`;
+            return;
+        }
+
+        let html = '';
+        filterRecord.forEach(record =>{
+            html += `
+                <strong>${record.date} ${record.time ? record.time : ''}</strong><br>
+                カテゴリ：${record.category}<br>
+                内容：${record.content}<br>
+                <button onclick="deleteRecord(${record.id})">削除</button><br>
+                `;
+            });
+
+        document.getElementById("recordList").innerHTML = html;
+    }
+
+    //初期状態で現在の日付を入れる
+    document.getElementById("date").valueAsDate = new Date();
+    </script>
+    
+</body>
+</html>

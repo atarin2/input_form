@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>簡単な配列練習</title>
+    </head>
+    <body>
+        <h1>配列の基本練習</h1>
+        
+        <p>
+            好きな食べ物：<input type="text" id="inputFood" placeholder="例：ラーメン" >
+            <button onclick="getFood()">追加</button>
+        </p>
+
+        <h2>保存した食べ物一覧</h2>
+        <p id="result-foods">まだありません</p>
+        
+        <hr>
+
+        <button onclick="content()" id="resultContent">配列の中身を確認</button>
+
+        <script>
+            let foods = [];
+
+           function getFood(){
+                const food = document.getElementById("inputFood").value.trim();
+
+                if (food === ''){
+                    alert("値を入力してください");
+                    return;
+                }
+
+                //配列に値を追加
+                foods.push(food);
+
+                //値を表示（追加する際は「、」をつける）
+                document.getElementById("result-foods").innerText = foods.join("、");
+
+                //入力欄を空にする
+                document.getElementById("inputFood").value = "";
+           }
+
+           function content(){ 
+               alert(`件数：${foods.length}件\n値：${foods}`);
+               return;
+           }
+        </script>
+    </body>
+</html>

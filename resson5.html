@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>submit関数とalertの使用練習</title>
+    </head>
+    <body>
+        <form id="form">
+            <label>
+                日付：<input type="date" id="date">
+            </label>
+
+            <br>
+            <button type="submit" id="button">送信</button>
+        </form>
+
+
+        <script>
+            document.getElementById("form").addEventListener("submit", function(e){
+                //e.preventDefault();
+                
+                //フォームを空にする
+                document.getElementById("form").reset();
+                //日付を現在の時刻に変更
+                document.getElementById("date").valueAsDate = new Date();
+
+                alert("送信しました");
+
+            });
+        </script>
+    </body>
+</html>

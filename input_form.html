@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>記録フォーム</title>
+</head>
+<body>
+    <h1>記録フォーム</h1>
+    
+    <form id="recordForm">
+        <div>
+            <label>日付*: <input type="date" id="date" name="date" required></label>
+            <label>時刻: <input type="time" id="time" name="time"></label>
+        </div>
+        
+        <div>
+            <label>カテゴリ*:
+                <select id="category" name="category" required>
+                    <option value="">カテゴリを選択してください</option>
+                    <option value="提出物">提出物</option>
+                    <option value="学習">学習</option>
+                    <option value="生活">生活</option>
+                    <option value="その他">その他</option>
+                </select>
+            </label>
+        </div>
+        
+        <div>
+            <label>内容*:
+                <textarea id="content" name="content" placeholder="詳細な内容を入力してください" required></textarea>
+            </label>
+        </div>
+        
+        <button type="submit">記録する</button>
+    </form>
+
+    <!-- 記録一覧表示エリア -->
+    <hr>
+    <h2>記録一覧</h2>
+
+    <div>
+        <strong>カテゴリで絞り込み:</strong>
+        <button onclick="filterByCategory('all')">すべて</button>
+        <button onclick="filterByCategory('提出物')">提出物</button>
+        <button onclick="filterByCategory('学習')">学習</button>
+        <button onclick="filterByCategory('生活')">生活</button>
+        <button onclick="filterByCategory('その他')">その他</button>
+    </div>
+    
+    <div id="recordList"></div>
+
+    <script>
+        // 記録データを保存する配列
+        let records = [];
+
+        // フォーム送信処理
+        document.getElementById('recordForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // フォームデータを取得
+            const formData = new FormData(this);
+            const record = {
+                id: Date.now(), // 簡単なID生成
+                date: formData.get('date'),
+                time: formData.get('time') || '',
+                category: formData.get('category'),
+                content: formData.get('content'),
+                createdAt: new Date().toISOString()
+            };
+            
+            // 記録を配列に追加
+            records.push(record);
+            
+            // 記録一覧を更新
+            displayRecords();
+            
+            // フォームをリセット
+            this.reset();
+            // 今日の日付を再設定
+            document.getElementById('date').valueAsDate = new Date();
+            
+            alert('記録が完了しました！');
+        });
+
+        // 記録一覧を表示する関数
+        function displayRecords() {
+            const listElement = document.getElementById('recordList');
+            
+            if (records.length === 0) {
+                listElement.innerHTML = '<p>記録がありません</p>';
+                return;
+            }
+            
+            // 日付順でソート（新しい順）
+            const sortedRecords = [...records].sort((a, b) => {
+                const dateTimeA = new Date(a.date + ' ' + (a.time || '00:00'));
+                const dateTimeB = new Date(b.date + ' ' + (b.time || '00:00'));
+                return dateTimeB - dateTimeA;
+            });
+            
+            let html = '';
+            sortedRecords.forEach(record => {
+                html += `
+                    <div style="border: 1px solid #ccc; margin: 10px 0; padding: 10px;">
+                        <strong>日時:</strong> ${record.date} ${record.time ? record.time : ''}<br>
+                        <strong>カテゴリ:</strong> ${record.category}<br>
+                        <strong>内容:</strong> ${record.content}<br>
+                        <button onclick="deleteRecord(${record.id})">削除</button>
+                    </div>
+                `;
+            });
+            
+            listElement.innerHTML = html;
+        }
+
+        // 記録を削除する関数
+        function deleteRecord(id) {
+            if (confirm('この記録を削除しますか？')) {
+                records = records.filter(record => record.id !== id);
+                displayRecords();
+            }
+        }
+
+        // カテゴリ別フィルタリング関数
+        function filterByCategory(category) {
+            const listElement = document.getElementById('recordList');
+            
+            if (category === 'all') {
+                displayRecords();
+                return;
+            }
+            
+            const filteredRecords = records.filter(record => record.category === category);
+            
+            if (filteredRecords.length === 0) {
+                listElement.innerHTML = `<p>${category}の記録がありません</p>`;
+                return;
+            }
+            
+            let html = '';
+            filteredRecords.forEach(record => {
+                html += `
+                    <div style="border: 1px solid #ccc; margin: 10px 0; padding: 10px;">
+                        <strong>日時:</strong> ${record.date} ${record.time ? record.time : ''}<br>
+                        <strong>カテゴリ:</strong> ${record.category}<br>
+                        <strong>内容:</strong> ${record.content}<br>
+                        <button onclick="deleteRecord(${record.id})">削除</button>
+                    </div>
+                `;
+            });
+            
+            listElement.innerHTML = html;
+        }
+
+        // 初期設定：今日の日付を設定
+        document.getElementById('date').valueAsDate = new Date();
+        
+        // 初期表示
+        displayRecords();
+    </script>
+
+    <!-- フィルタリング用ボタン -->
+    <hr>
+    
+</body>
+</html>

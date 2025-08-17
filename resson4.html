@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>簡単な配列練習</title>
+    </head>
+    <body>
+        <h1>配列の基本練習</h1>
+        
+        <p>
+            好きな食べ物：<input type="text" id="food" placeholder="例：ラーメン">
+            <button onclick="addFood()">追加</button>
+        </p>
+        
+        <h2>保存した食べ物一覧</h2>
+        <p id="food-list">まだありません</p>
+        
+        <hr>
+        <button onclick="showArray()">配列の中身を確認</button>
+
+        <script>
+            // これが配列！箱のようなもの
+            let foods = [];
+
+            function addFood() {
+                // 1. 入力した値を取得
+                const food = document.getElementById('food').value;
+                
+                // 2. 空じゃないかチェック
+                if (food === '') {
+                    alert('何か入力してください！');
+                    return;
+                }
+                
+                // 3. 配列に追加（これが重要！）
+                foods.push(food);
+                
+                // 4. 画面に表示
+                showFoodList();
+                
+                // 5. 入力欄をクリア
+                document.getElementById('food').value = '';
+                
+                console.log('追加されました:', food);
+                console.log('現在の配列:', foods);
+            }
+
+            function showFoodList() {
+                const listArea = document.getElementById('food-list');
+                
+                if (foods.length === 0) {
+                    listArea.innerText = 'まだありません';
+                    return;
+                }
+                
+                // 配列を文字列に変換して表示
+                listArea.innerText = foods.join('、');
+            }
+
+            function showArray() {
+                alert(`配列の中身: [${foods.join(', ')}]\n件数: ${foods.length}件`);
+                console.log('=== 配列の状態 ===');
+                console.log(foods);
+            }
+        </script>
+    </body>
+</html>
