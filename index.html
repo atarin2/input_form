@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>記録フォーム</title>
+</head>
+<body>
+    <h1>記録フォーム</h1>
+    
+    <form id="inputForm">
+        <label>日付*：<input type="date" id="date" name="date" required></label>
+        <label>時刻：<input type="time" id="time" name="time"></label>
+        <br>
+
+        <label>カテゴリ*：
+            <select id="category" name="category" required>
+                <option value="">カテゴリを選択してください</option>
+                <option value="提出物">提出物</option>
+                <option value="学習">学習</option>
+                <option value="生活">生活</option>
+                <option value="その他">その他</option>
+            </select>
+        </label>
+        <br>
+
+        <label>内容*：
+            <br>
+            <textarea id="content" name="content" placeholder="内容を入力してください" required></textarea>
+        </label>
+        <br>
+
+        <button type="submit">記録する</button>
+        <hr>
+    </form>
+
+    <h2>記録一覧</h2>
+
+    <div>
+        <strong>カテゴリで絞り込み：</strong>
+        <button onclick="filterCategory('すべて')">すべて</button>
+        <button onclick="filterCategory('提出物')">提出物</button>
+        <button onclick="filterCategory('学習')">学習</button>
+        <button onclick="filterCategory('生活')">生活</button>
+        <button onclick="filterCategory('その他')">その他</button>
+    </div>
+    
+    <p id="recordList">記録がありません</p>
+    <hr>
+
+    <script>
+        let records = [];
+
+        document.getElementById("inputForm").addEventListener("submit",function(reloadStop) {
+            reloadStop.preventDefault();
+
+        const formData = new FormData(this);
+
+        // ユニークIDとして現在時刻を使用
+        const record = {
+            id: Date.now(),
+            date: formData.get("date"),
+            time: formData.get("time"),
+            category: formData.get("category"),
+            content: formData.get("content"),
+        };
+
+        // 新しい記録を配列に追加
+        records.push(record);
+        // 記録一覧を更新表示
+        outputRecords();
+        // フォームをリセット
+        this.reset();
+        // 現在の日付を再設定
+        document.getElementById("date").valueAsDate = new Date();
+
+        alert("記録しました")
+        
+    });
+
+    function outputRecords(){
+        // 日時順にソートした配列のコピーを作成
+        const sortedRecords = [...records].sort((a, b) => {
+            const dateTimeA = new Date(a.date + ' ' + (a.time || "00:00"));
+            const dateTimeB = new Date(b.date + ' ' + (b.time || "00:00"));
+            return dateTimeA - dateTimeB;
+        });
+
+        if (records.length === 0){
+            document.getElementById('recordList').innerHTML = `<p>記録がありません</p>`
+            return;
+        }
+
+        let html = '';
+        sortedRecords.forEach(record =>{
+            html += `
+                <strong>${record.date}　${record.time ? record.time : ''}</strong><br>
+                カテゴリ：${record.category}<br>
+                内容：${record.content}<br>
+                <button onclick="deleteRecord(${record.id})">削除</button><br>
+                `;
+            });
+
+        document.getElementById("recordList").innerHTML = html;
+    }
+    
+    function deleteRecord(id) {
+        if (confirm('この記録を削除しますか？')){
+            // 指定されたID以外の記録を残す
+            records = records.filter(record => record.id !== id);
+            outputRecords();
+        }
+    }
+
+    function filterCategory(category) {
+        if (category === 'すべて'){
+            outputRecords();
+            return;
+        }
+
+        // 指定されたカテゴリの記録のみを抽出
+        const filterRecord = records.filter(record => record.category === category);
+
+        if (filterRecord.length === 0){
+            document.getElementById('recordList').innerHTML = `<p>「${category}」の記録がありません</p>`;
+            return;
+        }
+
+        let html = '';
+        filterRecord.forEach(record =>{
+            html += `
+                <strong>${record.date} ${record.time ? record.time : ''}</strong><br>
+                カテゴリ：${record.category}<br>
+                内容：${record.content}<br>
+                <button onclick="deleteRecord(${record.id})">削除</button><br>
+                `;
+            });
+
+        document.getElementById("recordList").innerHTML = html;
+    }
+
+    // 初期表示時に現在の日付をセット
+    document.getElementById("date").valueAsDate = new Date();
+    </script>
+    
+</body>
+</html>
